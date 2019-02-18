@@ -55,9 +55,9 @@ void put_control_bits(QByteArray &word,const size_t lenth)
         size_t control_bit = scalar(row,word);
         control_bit = control_bit%2;
         if (control_bit)
-            word[(unsigned int)pow(2,i)] = '1';
+            word[(unsigned int)pow(2,i)-1] = '1';
         else {
-            word[(unsigned int)pow(2,i)] = '0';
+            word[(unsigned int)pow(2,i)-1] = '0';
         }
     }
 }
@@ -121,7 +121,7 @@ size_t scalar(QByteArray x,QByteArray y)
     return res;
 }
 
-void make_error(QByteArrayList &data, size_t lenth, size_t errors)
+QVector<QPoint> make_error(QByteArrayList &data, size_t lenth, size_t errors)
 {
     qDebug() <<"____________" <<endl << "IN MAKE ERRORS:" <<endl<<"____________" << endl;
     qDebug () << "WITHOUT ERRORS:" << data <<endl;
@@ -129,12 +129,14 @@ void make_error(QByteArrayList &data, size_t lenth, size_t errors)
     QTime midnight(0,0,0);
     qsrand(midnight.secsTo(QTime::currentTime()));
     qDebug() << "Errors:" << endl;
+    QVector<QPoint> errors_coord;
     for (int i = 0; i < errors; i++)
     {
 
         size_t pos = qrand()%lenth*data.size();
         size_t word_id = pos/lenth;
         size_t byte_id =pos%lenth;
+        errors_coord.push_back(QPoint(word_id,byte_id));
         qDebug () << "word id : byte id : byte" << endl;
         qDebug () << word_id << " : " << byte_id << " : "<< data[word_id][byte_id]<< endl;
         if (data[word_id][byte_id] == '0')
@@ -144,6 +146,7 @@ void make_error(QByteArrayList &data, size_t lenth, size_t errors)
         }
     }
     qDebug () << "WITH ERRORS:" << data <<endl;
+    return errors_coord;
 }
 
 QByteArrayList decode(QByteArrayList data, size_t lenth)
@@ -190,8 +193,8 @@ void delete_control_bits(QByteArray & word ,size_t count_of_control_bits)
 {
     //qDebug() << "BEFOR REMOVE:" << word<<endl;
     for (int i =0 ; i < count_of_control_bits; i++)
-        word.remove(pow(2,i)-i,1);
-    // qDebug() << "AFTER REMOVE:" << word<<endl;
+        word.remove((unsigned int)pow(2,i)-i-1,1);
+    //qDebug() << "AFTER REMOVE:" << word<<endl;
 }
 QString to_str(const QByteArray & data)
 {
@@ -207,7 +210,9 @@ QString to_str(const QByteArray & data)
         list.push_back(buf);
         //qDebug() << "LIST " << i << " : " << list[i] <<endl;
         bitset<CHAR_BIT> b(list[i].toStdString().c_str()); // одна из проблем тут
-        msg+= static_cast<unsigned char>( b.to_ulong());
+        long int ascii_code= b.to_ulong();
+        qDebug() << ascii_code << " : " << char(ascii_code) <<endl;
+        msg+= static_cast<char>(ascii_code);
     }
     return msg;
 }

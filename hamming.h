@@ -8,6 +8,7 @@
 #include <ctime>
 #include <cstdlib>
 #include <QTime>
+#include <QPoint>
 #include "hamming.h"
 using namespace std;
 
@@ -23,7 +24,7 @@ QByteArray get_row(const QByteArrayList matrix,const size_t number);
 
 size_t scalar(QByteArray x,QByteArray y);
 
-void make_error(QByteArrayList & data,size_t lenth,size_t errors);
+QVector<QPoint> make_error(QByteArrayList & data,size_t lenth,size_t errors);
 
 QByteArrayList decode(QByteArrayList data,size_t lenth);
 
