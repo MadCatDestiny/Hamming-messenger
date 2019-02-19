@@ -2,6 +2,18 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <QDebug>
+#include <bitset>
+#include <string>
+#include <climits>
+#include <QString>
+#include <fstream>
+#include <QFile>
+#include <QImage>
+#include <QPixmap>
+#include <QBitArray>
+#include <cstdio>
+#include <QBuffer>
 #include "hamming.h"
 namespace Ui {
 class MainWindow;

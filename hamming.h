@@ -31,3 +31,9 @@ QByteArrayList decode(QByteArrayList data,size_t lenth);
 void delete_control_bits(QByteArray & word, size_t count_of_control_bits);
 
 QString to_str(const QByteArray & data);
+
+bool check_errors(QByteArrayList,QVector<QPoint>,QByteArrayList);
+
+size_t count_of_controls_bits(size_t lenth);
+
+QByteArrayList make_list(QByteArray data,size_t lenth);
