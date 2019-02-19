@@ -57,7 +57,11 @@
            </widget>
           </item>
           <item>
-           <widget class="QSpinBox" name="lenth_spinBox"/>
+           <widget class="QSpinBox" name="lenth_spinBox">
+            <property name="maximum">
+             <number>999</number>
+            </property>
+           </widget>
           </item>
          </layout>
         </item>
@@ -71,7 +75,11 @@
            </widget>
           </item>
           <item>
-           <widget class="QSpinBox" name="errors_spinBox"/>
+           <widget class="QSpinBox" name="errors_spinBox">
+            <property name="maximum">
+             <number>999</number>
+            </property>
+           </widget>
           </item>
          </layout>
         </item>

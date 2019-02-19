@@ -26,56 +26,43 @@ void MainWindow::on_pushButton_clicked()
     QByteArray bytes;
     string str;
     string data;
+    QPoint img_size;
     size_t lenth = ui->lenth_spinBox->value();
     size_t errors = ui->errors_spinBox->value();
     ui->plainTextEdit->append("##############################");
-    if(ui->checkBox->isChecked())
+
+    if(ui->checkBox->isChecked()) // Если строка является путем к файлу
     {
         QString path = ui->lineEdit->text();
         ui->plainTextEdit->append("FILE: " + path);
         QImage img = QImage(path);
-        QBuffer buffer(&bytes);
-        qDebug() << bytes << endl;
-        buffer.open(QIODevice::WriteOnly);
-        img.save(&buffer, path.split('.')[1].toStdString().c_str());
-        str = bytes.toStdString();
-        bytes.clear();
-        //
-
-        /*QFile histogramFile(path);
-        if (histogramFile.open(QIODevice::ReadOnly | QIODevice::Text))
+        img_size.rx() = img.width();
+        img_size.ry() = img.height();
+        for(int i=0 ; i <img.height();i++)
         {
-
-            QDataStream stream (&histogramFile);
-            stream >>img;
-            QByteArray buf = histogramFile.readAll();
-            str = buf.toStdString();
-            histogramFile.close();            
+            for (int j= 0; j < img.width(); j++) // записываем каждый пиксель как 3 числа RGB  в двоичной с.с.
+            {
+                QColor color = img.pixelColor(i,j);
+                bytes.push_back(bitset<8>(color.red()).to_string().c_str());
+                bytes.push_back(bitset<8>(color.green()).to_string().c_str());
+                bytes.push_back(bitset<8>(color.blue()).to_string().c_str());
+            }
         }
-        else
-        {
-            ui->plainTextEdit->append("file couldn't be open");
-            ui->plainTextEdit->append("##############################");
-            return;
-        }*/
     }
-    else
+    else // если просто текст
     {
         str = ui->lineEdit->text().toStdString();
         ui->plainTextEdit->append("Input: " + QString(str.c_str()));
 
-    }
-        for (int i =0; i < str.size(); i++)
+        for (int i =0; i < str.size(); i++) // записываем каждый символ как двоичное число
         {
             bitset<CHAR_BIT> b(str[i]);
             data+=b.to_string();
         }
-       // ui->plainTextEdit->append("DATA: " + QString(data.c_str()));
         bytes = QString(data.c_str()).toUtf8();
-
+    }
 
     QByteArrayList list =  encode(bytes,lenth);
-
     QVector<QPoint> errors_coord = make_error(list,lenth,errors);
     ui->plainTextEdit->append("Errors in :\n word id : byte id ");
 
@@ -88,34 +75,29 @@ void MainWindow::on_pushButton_clicked()
         res.push_back(res_list[i]);
 
     QString msg = to_str(res);
-    qDebug() <<msg <<endl;
     if(ui->checkBox->isChecked())
     {
         QStringList list = ui->lineEdit->text().split('.');
-
-        /*QImage img;
-        img.fromData(QByteArray(msg.toStdString().c_str()));
-
-
-        if(img.save("_res"))
-             ui->plainTextEdit->append("Result saved in same place with mark '_res' ");
-        else
-            qDebug() <<"ERROR"<<endl;
-        qDebug() << list[0]<<endl;*/
-
-        QFile histogramFile(list[0] + "_res." + list[1]);
-        if (histogramFile.open(QIODevice::ReadWrite))
+        QByteArrayList colors = make_list(res,8);
+        QImage img(QSize(img_size.x(),img_size.y()),QImage::Format::Format_RGB32);
+        for(int i=0 ; i < img_size.y();i++)
         {
-            histogramFile.write(msg.toStdString().c_str());
-            histogramFile.close();
-            ui->plainTextEdit->append("Result saved in same place with mark '_res' ");
+            for (int j= 0; j < img_size.x(); j++)
+            {
+                bitset<8> r(colors[(i* img_size.x() + j)*3].toStdString().c_str());
+                bitset<8> g(colors[(i* img_size.x() + j)*3+1].toStdString().c_str());
+                bitset<8> b(colors[(i* img_size.x() + j)*3+2].toStdString().c_str());
+                img.setPixelColor(i,j, QColor(r.to_ulong(),g.to_ulong(),b.to_ulong()));
+            }
         }
+
+        if(img.save(list[0] + "_res." + list[1],list[1].toStdString().c_str()))
+             ui->plainTextEdit->append("Result saved in same place with mark '_res' ");
     }
     else
         ui->plainTextEdit->append("Output: " + msg);
 
     bool decode_res = check_errors(make_list(bytes,lenth),errors_coord,res_list);
-
     if (decode_res)
         ui->plainTextEdit->append("Successfully decoded!");
     else

@@ -7,13 +7,10 @@
 #include <string>
 #include <climits>
 #include <QString>
-#include <fstream>
 #include <QFile>
 #include <QImage>
-#include <QPixmap>
-#include <QBitArray>
-#include <cstdio>
 #include <QBuffer>
+#include <QRgb>
 #include "hamming.h"
 namespace Ui {
 class MainWindow;

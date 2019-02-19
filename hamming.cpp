@@ -2,9 +2,7 @@
 
 
 QByteArrayList encode(QByteArray data,const size_t lenth)
-{
-    qDebug() <<"____________" <<endl << "IN ENCODE:" <<endl<<"____________" << endl;
-    qDebug() << data<<endl;
+{ 
     QByteArrayList list = make_list(data,lenth);
 
     for (int i =0; i< list.size(); i++) //вставляем контрольные биты
@@ -82,7 +80,7 @@ size_t scalar(QByteArray x,QByteArray y)
         xv.push_back(x[i]);
         yv.push_back(y[i]);
     }
-    //qDebug() << "X:" << x <<endl << "Y:" << y <<endl;
+
     size_t res = 0;
     for (int i =0; i < x.size(); i++)
         res+=QString(xv[i]).toInt()* QString(yv[i]).toInt();
@@ -163,10 +161,10 @@ QString to_str(const QByteArray & data)
         QString buf;
         for (int j =0; j < 8; j++)
             buf.push_back(data[i*8+j]);
+
         list.push_back(buf);
         bitset<CHAR_BIT> b(list[i].toStdString().c_str());
-        long int ascii_code= b.to_ulong();
-        //qDebug() << ascii_code << " : " << char(ascii_code) <<endl;
+        long int ascii_code= b.to_ulong(); 
         msg+= static_cast<char>(ascii_code);
     }
     return msg;
@@ -176,10 +174,7 @@ bool check_errors(QByteArrayList list, QVector<QPoint> errors, QByteArrayList re
 {
     for (int i =0; i < errors.size(); i++)
         if(list[errors[i].x()] != res_list[errors[i].x()])
-        {
-            qDebug() << list[errors[i].x()] << " != " << res_list[errors[i].x()] <<endl;
             return false;
-        }
     return  true;
 }
 
