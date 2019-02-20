@@ -36,16 +36,15 @@ QByteArrayList create_transition_matrix(const size_t word_size,const size_t coun
 {
     QByteArrayList matrix;
     matrix.reserve(word_size);
-
     for (int i =0; i < word_size; i++)
     {
         QByteArray column;
-        bitset<8> b(i+1);
+        bitset<1024> b(i+1);
         QString bits =b.to_string().c_str();
 
         for (int j =0; j < count_of_control_bits; j++)
         {
-            QByteArray bit = QByteArray(QString(bits[7-j]).toUtf8());
+            QByteArray bit = QByteArray(QString(bits[1023-j]).toUtf8());
             column.push_back(bit);
         }
         matrix.push_back(column);

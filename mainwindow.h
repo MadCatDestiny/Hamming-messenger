@@ -26,7 +26,11 @@ public:
 
 private slots:
     void on_pushButton_clicked();
-
+    QByteArray img_to_bits(QPoint &img_size,QString path);
+    QByteArray str_to_bits(QString msg);
+    QImage bits_to_img(QByteArray res, QPoint& img_size);
+    QByteArray list_to_arr(QByteArrayList res_list);
+    bool check_path(QString path);
 private:
     Ui::MainWindow *ui;
 };
