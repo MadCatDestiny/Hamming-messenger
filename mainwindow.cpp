@@ -7,9 +7,9 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    ui->lenth_spinBox->setMinimum(0);
-    ui->errors_spinBox->setMinimum(0);
-    ui->lenth_spinBox->setValue(8);
+    ui->lenth_spinBox->setMinimum(1);
+    ui->errors_spinBox->setMinimum(1);
+    ui->lenth_spinBox->setValue(1);
     ui->errors_spinBox->setValue(1);
 }
 
@@ -27,12 +27,15 @@ void MainWindow::on_pushButton_clicked()
     string str;
     string data;
     QPoint img_size;
-    size_t lenth = ui->lenth_spinBox->value();
+    if (ui->checkBox->isChecked());
+    size_t words_number = ui->lenth_spinBox->value();
+    size_t length;
     size_t errors = ui->errors_spinBox->value();
     ui->plainTextEdit->append("##############################");
 
     if(ui->checkBox->isChecked()) // Если строка является путем к файлу
     {
+
         QString path = ui->lineEdit->text();
         ui->plainTextEdit->append("FILE: " + path);
         QImage img = QImage(path);
@@ -47,7 +50,7 @@ void MainWindow::on_pushButton_clicked()
                 bytes.push_back(bitset<8>(color.green()).to_string().c_str());
                 bytes.push_back(bitset<8>(color.blue()).to_string().c_str());
             }
-        }
+        }        
     }
     else // если просто текст
     {
@@ -61,15 +64,15 @@ void MainWindow::on_pushButton_clicked()
         }
         bytes = QString(data.c_str()).toUtf8();
     }
-
-    QByteArrayList list =  encode(bytes,lenth);
-    QVector<QPoint> errors_coord = make_error(list,lenth,errors);
+    length = bytes.size()/words_number;
+    QByteArrayList list =  encode(bytes,length);
+    QVector<QPoint> errors_coord = make_error(list,length,errors);
     ui->plainTextEdit->append("Errors in :\n word id : byte id ");
 
     for (int i =0; i < errors_coord.size(); i++)
         ui->plainTextEdit->append(QString::number(errors_coord[i].x()) + " : " + QString::number(errors_coord[i].y()));
 
-    QByteArrayList res_list = decode(list,lenth);
+    QByteArrayList res_list = decode(list,length);
     QByteArray res;
     for (int i =0; i < res_list.size(); i++)
         res.push_back(res_list[i]);
@@ -97,7 +100,7 @@ void MainWindow::on_pushButton_clicked()
     else
         ui->plainTextEdit->append("Output: " + msg);
 
-    bool decode_res = check_errors(make_list(bytes,lenth),errors_coord,res_list);
+    bool decode_res = check_errors(make_list(bytes,length),errors_coord,res_list);
     if (decode_res)
         ui->plainTextEdit->append("Successfully decoded!");
     else
