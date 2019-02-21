@@ -161,18 +161,17 @@ QByteArray MainWindow::str_to_bits(QString msg)
 QImage MainWindow::bits_to_img(QByteArray res, QPoint &img_size)
 {
     QByteArrayList colors = make_list(res,8);
-    QImage img(QSize(img_size.x(),img_size.y()),QImage::Format::Format_RGB32);
-    for(int i=0 ; i < img_size.y();i++)
+    QImage img(QSize (img_size.x(),img_size.y()),QImage::Format::Format_RGB32);
+    for(int i=0 ; i < img_size.x(); i++)
     {
-        for (int j= 0; j < img_size.x(); j++)
+        for (int j= 0; j < img_size.y(); j++)
         {
-            bitset<8> r(colors[(i* img_size.x() + j)*3].toStdString().c_str());
-            bitset<8> g(colors[(i* img_size.x() + j)*3+1].toStdString().c_str());
-            bitset<8> b(colors[(i* img_size.x() + j)*3+2].toStdString().c_str());
-            img.setPixelColor(j,i, QColor(r.to_ulong(),g.to_ulong(),b.to_ulong()));
+            bitset<8> r(colors[(i* img_size.y() + j)*3].toStdString().c_str());
+            bitset<8> g(colors[(i* img_size.y() + j)*3+1].toStdString().c_str());
+            bitset<8> b(colors[(i* img_size.y() + j)*3+2].toStdString().c_str());
+            img.setPixelColor(i,j, QColor(r.to_ulong(),g.to_ulong(),b.to_ulong()));
         }
-    }
-
+    }     
     return img;
 }
 
