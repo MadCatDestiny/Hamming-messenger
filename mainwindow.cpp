@@ -8,9 +8,17 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
     ui->lenth_spinBox->setMinimum(1);
-    ui->errors_spinBox->setMinimum(1 );
+    ui->errors_spinBox->setMinimum(1);
+
     ui->lenth_spinBox->setValue(1);
     ui->errors_spinBox->setValue(1);
+
+    ui->lenth_spinBox->setMaximum(100000);
+    ui->errors_spinBox->setMaximum(100000);
+
+    ui->label_3->setVisible(false);
+    ui->label_4->setVisible(false);
+    ui->label_5->setVisible(false);
 }
 
 MainWindow::~MainWindow()
@@ -20,6 +28,9 @@ MainWindow::~MainWindow()
 
 void MainWindow::on_pushButton_clicked()
 {
+    ui->label_3->setVisible(false);
+    ui->label_4->setVisible(false);
+    ui->label_5->setVisible(false);
     if (ui->lineEdit->text().isEmpty())
         return;
 
@@ -38,13 +49,14 @@ void MainWindow::on_pushButton_clicked()
             return;
 
         bytes = img_to_bits(img_size,path);
+        if (bytes == nullptr)
+            return;
     }
     else // если просто текст
     {
         QString msg = ui->lineEdit->text();
         bytes = str_to_bits(msg);
     }
-
     size_t length = bytes.size()/words_number;
     if (bytes.size()%words_number != 0)
         length++;
@@ -52,9 +64,9 @@ void MainWindow::on_pushButton_clicked()
     QByteArrayList list =  encode(bytes,length);
 
     QVector<QPoint> errors_coord = make_error(list,length,errors);
-    QByteArrayList list_with_errors = list;
+    QByteArrayList list_with_errors;
     for(int i =0; i < list.size(); i++)
-        delete_control_bits(list_with_errors[i],count_of_controls_bits(length));
+        list_with_errors.push_back(delete_control_bits(list[i],count_of_controls_bits(length)));
 
     QByteArray res_with_errors = list_to_arr(list_with_errors);
     if(ui->checkBox->isChecked())
@@ -63,6 +75,8 @@ void MainWindow::on_pushButton_clicked()
         QStringList path = ui->lineEdit->text().split('.');
         if(img.save(path[0] + "_err." + path[1],path[1].toStdString().c_str()))
             ui->plainTextEdit->append("Result with errors saved in same place with mark '_err' ");
+        ui->label_4->setVisible(true);
+        ui->label_4->setPixmap(QPixmap::fromImage(img));
     }
     else {
         QString msg = to_str(res_with_errors);
@@ -85,6 +99,8 @@ void MainWindow::on_pushButton_clicked()
         QStringList path = ui->lineEdit->text().split('.');
         if(img.save(path[0] + "_res." + path[1],path[1].toStdString().c_str()))
             ui->plainTextEdit->append("Result saved in same place with mark '_res' ");
+        ui->label_5->setVisible(true);
+        ui->label_5->setPixmap(QPixmap::fromImage(img));
     }
     else
     {
@@ -104,15 +120,17 @@ void MainWindow::on_pushButton_clicked()
 
 QByteArray MainWindow::img_to_bits(QPoint &img_size,QString path)
 {
-    QByteArray bytes;
-
     ui->plainTextEdit->append("FILE: " + path);
     QImage img = QImage(path);
     img_size.rx() = img.width();
     img_size.ry() = img.height();
-    for(int i=0 ; i <img.height();i++)
+    QByteArray bytes;
+
+    ui->label_3->setVisible(true);
+    ui->label_3->setPixmap(QPixmap::fromImage(img));
+    for(int i=0 ; i <img.width();i++)
     {
-        for (int j= 0; j < img.width(); j++) // записываем каждый пиксель как 3 числа RGB  в двоичной с.с.
+        for (int j= 0; j < img.height(); j++) // записываем каждый пиксель как 3 числа RGB  в двоичной с.с.
         {
             QColor color = img.pixelColor(i,j);
             bytes.push_back(bitset<8>(color.red()).to_string().c_str());
@@ -151,14 +169,14 @@ QImage MainWindow::bits_to_img(QByteArray res, QPoint &img_size)
             bitset<8> r(colors[(i* img_size.x() + j)*3].toStdString().c_str());
             bitset<8> g(colors[(i* img_size.x() + j)*3+1].toStdString().c_str());
             bitset<8> b(colors[(i* img_size.x() + j)*3+2].toStdString().c_str());
-            img.setPixelColor(i,j, QColor(r.to_ulong(),g.to_ulong(),b.to_ulong()));
+            img.setPixelColor(j,i, QColor(r.to_ulong(),g.to_ulong(),b.to_ulong()));
         }
     }
 
     return img;
 }
 
-QByteArray MainWindow::list_to_arr(QByteArrayList res_list)
+QByteArray MainWindow::list_to_arr(QByteArrayList &res_list)
 {
     QByteArray res;
     for (int i =0; i < res_list.size(); i++)

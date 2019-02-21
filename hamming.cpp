@@ -137,16 +137,18 @@ QByteArrayList decode(QByteArrayList data, size_t lenth)
             else
                 data[i][id_wrong_bit-1] = '1';
         }
-        delete_control_bits(data[i],count_of_control_bits);
+        data[i] = delete_control_bits(data[i],count_of_control_bits);
     }
 
     return data;
 }
 
-void delete_control_bits(QByteArray & word ,size_t count_of_control_bits)
+QByteArray delete_control_bits(const QByteArray word ,size_t count_of_control_bits)
 {
+    QByteArray buf(word.data());
     for (int i =0 ; i < count_of_control_bits; i++)
-        word.remove((unsigned int)pow(2,i)-i-1,1);
+        buf.remove((unsigned int)pow(2,i)-i-1,1);
+    return buf;
 }
 
 QString to_str(const QByteArray & data)

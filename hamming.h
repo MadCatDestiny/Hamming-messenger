@@ -28,7 +28,7 @@ QVector<QPoint> make_error(QByteArrayList & data,size_t lenth,size_t errors);
 
 QByteArrayList decode(QByteArrayList data,size_t lenth);
 
-void delete_control_bits(QByteArray & word, size_t count_of_control_bits);
+QByteArray delete_control_bits(const QByteArray word, size_t count_of_control_bits);
 
 QString to_str(const QByteArray & data);
 
