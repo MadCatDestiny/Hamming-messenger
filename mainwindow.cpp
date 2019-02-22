@@ -75,8 +75,12 @@ void MainWindow::on_pushButton_clicked()
         QStringList path = ui->lineEdit->text().split('.');
         if(img.save(path[0] + "_err." + path[1],path[1].toStdString().c_str()))
             ui->plainTextEdit->append("Result with errors saved in same place with mark '_err' ");
+
         ui->label_4->setVisible(true);
-        ui->label_4->setPixmap(QPixmap::fromImage(img));
+        if (img.size().width() < 400 && img.size().height() < 400)
+            ui->label_4->setPixmap(QPixmap::fromImage(img.scaled(400,400,Qt::AspectRatioMode::KeepAspectRatio)));
+        else
+            ui->label_4->setPixmap(QPixmap::fromImage(img));
     }
     else {
         QString msg = to_str(res_with_errors);
@@ -99,8 +103,12 @@ void MainWindow::on_pushButton_clicked()
         QStringList path = ui->lineEdit->text().split('.');
         if(img.save(path[0] + "_res." + path[1],path[1].toStdString().c_str()))
             ui->plainTextEdit->append("Result saved in same place with mark '_res' ");
+
         ui->label_5->setVisible(true);
-        ui->label_5->setPixmap(QPixmap::fromImage(img));
+        if (img.size().width() < 400 && img.size().height() < 400)
+            ui->label_5->setPixmap(QPixmap::fromImage(img.scaled(400,400,Qt::AspectRatioMode::KeepAspectRatio)));
+        else
+            ui->label_5->setPixmap(QPixmap::fromImage(img));
     }
     else
     {
@@ -115,7 +123,6 @@ void MainWindow::on_pushButton_clicked()
         ui->plainTextEdit->append("Decode failed!");
 
      ui->plainTextEdit->append("##############################");
-     ui->lineEdit->clear();
 }
 
 QByteArray MainWindow::img_to_bits(QPoint &img_size,QString path)
@@ -127,7 +134,10 @@ QByteArray MainWindow::img_to_bits(QPoint &img_size,QString path)
     QByteArray bytes;
 
     ui->label_3->setVisible(true);
-    ui->label_3->setPixmap(QPixmap::fromImage(img));
+    if (img.size().width() < 400 && img.size().height() < 400)
+        ui->label_3->setPixmap(QPixmap::fromImage(img.scaled(400,400,Qt::AspectRatioMode::KeepAspectRatio)));
+    else
+        ui->label_3->setPixmap(QPixmap::fromImage(img));
     for(int i=0 ; i <img.width();i++)
     {
         for (int j= 0; j < img.height(); j++) // записываем каждый пиксель как 3 числа RGB  в двоичной с.с.
